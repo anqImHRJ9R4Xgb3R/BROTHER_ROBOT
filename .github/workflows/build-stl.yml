@@ -1,5 +1,10 @@
 name: Build STL
 
+# ここを追加
+permissions:
+  contents: read     # ソースコードを読む権限
+  actions: write     # アーティファクトを upload する権限
+  
 on:
   push:
     #paths:
