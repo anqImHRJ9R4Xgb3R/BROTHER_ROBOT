@@ -28,7 +28,7 @@ jobs:
       # STL を一括レンダリング
       - name: Render all parts
         run: |
-          for p in assembly hip_bracket xl330_mount 2xl430_mount upper_leg lower_leg foot_plate waist_frame; do
+          for p in assembly hip_bracket xl330_mount _2xl430_mount upper_leg lower_leg foot_plate waist_frame; do
             openscad -o ${p}.stl brother_robot_complete_with_hinges.scad -D part=\"$p\"
           done
 
