@@ -9,25 +9,52 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      # コードを取得
+      - uses: actions/checkout@v3
 
+      # OpenSCAD をインストール
       - name: Install OpenSCAD
-        run: sudo apt-get update && sudo apt-get install -y openscad
-
-      - name: Render all parts to STL
         run: |
-          for p in assembly hip_bracket xl330_mount 2xl430_mount upper_leg lower_leg foot_plate waist_frame; do
-            openscad \
-              -o ${p}.stl \
-              brother_robot_complete_with_hinges.scad \
-              -D part=\"$p\"
-          done
+          sudo apt-get update
+          sudo apt-get install -y openscad
 
+      # 各パートをレンダリングして STL 出力
+      - name: Render assembly STL
+        run: openscad -o assembly.stl brother_robot_complete_with_hinges.scad
+
+      - name: Render hip bracket STL
+        run: openscad -o hip_bracket.stl brother_robot_complete_with_hinges.scad -D part=\"hip_bracket\"
+
+      - name: Render xl330 mount STL
+        run: openscad -o xl330_mount.stl brother_robot_complete_with_hinges.scad -D part=\"xl330_mount\"
+
+      - name: Render 2xl430 mount STL
+        run: openscad -o 2xl430_mount.stl brother_robot_complete_with_hinges.scad -D part=\"_2xl430_mount\"
+
+      - name: Render upper leg STL
+        run: openscad -o upper_leg.stl brother_robot_complete_with_hinges.scad -D part=\"upper_leg\"
+
+      - name: Render lower leg STL
+        run: openscad -o lower_leg.stl brother_robot_complete_with_hinges.scad -D part=\"lower_leg\"
+
+      - name: Render foot plate STL
+        run: openscad -o foot_plate.stl brother_robot_complete_with_hinges.scad -D part=\"foot_plate\"
+
+      - name: Render waist frame STL
+        run: openscad -o waist_frame.stl brother_robot_complete_with_hinges.scad -D part=\"waist_frame\"
+
+      # ビルド成果物をまとめてアップロード
       - name: Upload STL artifacts
         uses: actions/upload-artifact@v3
         with:
           name: stl-artifacts
-          path: '*.stl'
+          path: |
+            assembly.stl
+            hip_bracket.stl
+            xl330_mount.stl
+            2xl430_mount.stl
+            upper_leg.stl
+            lower_leg.stl
+            foot_plate.stl
+            waist_frame.stl
