@@ -1,0 +1,33 @@
+name: Build STL
+
+on:
+  push:
+    paths:
+      - '**/*.scad'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install OpenSCAD
+        run: sudo apt-get update && sudo apt-get install -y openscad
+
+      - name: Render all parts to STL
+        run: |
+          for p in assembly hip_bracket xl330_mount 2xl430_mount upper_leg lower_leg foot_plate waist_frame; do
+            openscad \
+              -o ${p}.stl \
+              brother_robot_complete_with_hinges.scad \
+              -D part=\"$p\"
+          done
+
+      - name: Upload STL artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: stl-artifacts
+          path: '*.stl'
