@@ -1,32 +1,40 @@
-  name: Build STL
+name: Build STL          # ← ワークフロー名
 
-# 権限（Artifacts を Upload するのに write が要る）
+# ❶   権限（Artifacts を upload するのに write が必要）
 permissions:
   contents: read
   actions: write
 
+# ❷   トリガー定義　← ここが無い／ずれるとエラーになる
 on:
-  push:
+  push:                  # .scad を push した時に自動実行
     paths:
       - '**/*.scad'
-  workflow_dispatch:
+  workflow_dispatch:     # Actions 画面の “Run workflow” でも手動実行可
 
 jobs:
   build:
-    runs-on: ubuntu-22.04          # ★ 24.04 ではなく 22.04 を指定
+    runs-on: ubuntu-22.04      # 24.04 だと upload-artifact が落ちるので固定
     steps:
-      - uses: actions/checkout@v4  # 最新版
+      # ソース取得
+      - uses: actions/checkout@v4
+
+      # OpenSCAD インストール
       - name: Install OpenSCAD
         run: |
           sudo apt-get update -y
           sudo apt-get install -y openscad
-      - name: Render all parts to STL
+
+      # STL を一括レンダリング
+      - name: Render all parts
         run: |
           for p in assembly hip_bracket xl330_mount 2xl430_mount upper_leg lower_leg foot_plate waist_frame; do
             openscad -o ${p}.stl brother_robot_complete_with_hinges.scad -D part=\"$p\"
           done
+
+      # アーティファクトにまとめる
       - name: Upload STL artifacts
-        uses: actions/upload-artifact@v4   # v4 に上げても OK
+        uses: actions/upload-artifact@v4
         with:
           name: stl-artifacts
           path: '*.stl'
