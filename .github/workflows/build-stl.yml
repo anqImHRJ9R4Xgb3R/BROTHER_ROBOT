@@ -3,7 +3,7 @@ name: Build STL
 on:
   push:
     #paths:
-      - '**/*.scad'
+      #- '**/*.scad'
   workflow_dispatch:
 
 jobs:
